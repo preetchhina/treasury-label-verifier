@@ -7,10 +7,10 @@ public sealed class LabelAnalysisOptions
     public const string SectionName = "LabelAnalysis";
 
     [Required]
-    public string Provider { get; set; } = "Demo";
+    public string Provider { get; set; } = "LocalOcr";
 
     [Required]
-    public string Model { get; set; } = "gpt-4o-mini";
+    public string TesseractPath { get; set; } = "tesseract";
 
     [Range(1, 60)]
     public int TimeoutSeconds { get; set; } = 15;

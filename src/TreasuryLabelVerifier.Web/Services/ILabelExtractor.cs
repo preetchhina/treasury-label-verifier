@@ -10,6 +10,7 @@ public interface ILabelExtractor
         ReadOnlyMemory<byte> image,
         string mediaType,
         string fileName,
+        LabelApplication application,
         CancellationToken cancellationToken);
 }
 

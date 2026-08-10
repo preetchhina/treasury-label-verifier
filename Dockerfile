@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim AS build
 WORKDIR /src
 COPY TreasuryLabelVerifier.sln ./
 COPY src/TreasuryLabelVerifier.Web/TreasuryLabelVerifier.Web.csproj src/TreasuryLabelVerifier.Web/
@@ -8,9 +8,13 @@ COPY . .
 RUN dotnet publish src/TreasuryLabelVerifier.Web/TreasuryLabelVerifier.Web.csproj \
     --configuration Release --no-restore --output /app/publish
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-bookworm-slim AS final
 WORKDIR /app
-RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends tesseract-ocr tesseract-ocr-eng \
+    && rm -rf /var/lib/apt/lists/* \
+    && addgroup --system appgroup \
+    && adduser --system --ingroup appgroup appuser
 COPY --from=build --chown=appuser:appgroup /app/publish .
 USER appuser
 ENV ASPNETCORE_URLS=http://+:8080 \

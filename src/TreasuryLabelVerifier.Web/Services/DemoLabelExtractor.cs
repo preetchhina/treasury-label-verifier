@@ -10,6 +10,7 @@ public sealed class DemoLabelExtractor : ILabelExtractor
         ReadOnlyMemory<byte> image,
         string mediaType,
         string fileName,
+        LabelApplication application,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -18,7 +19,7 @@ public sealed class DemoLabelExtractor : ILabelExtractor
         if (!isPassSample && !isIssueSample)
         {
             throw new LabelAnalysisException(
-                "Live image analysis is not configured. Use the built-in sample or configure the OpenAI provider as described in the README.");
+                "This fixture-only provider recognizes the two included samples. Use the local OCR provider for arbitrary images.");
         }
 
         var warning = isIssueSample

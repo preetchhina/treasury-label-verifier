@@ -27,7 +27,7 @@ public sealed class IndexModel(
     public List<IFormFile> Uploads { get; set; } = [];
 
     public List<AnalysisItem> Items { get; } = [];
-    public bool IsDemoProvider => extractor is DemoLabelExtractor;
+    public bool UsesLocalOcr => extractor is TesseractLabelExtractor;
     public int MaxBatchSize => _options.MaxBatchSize;
     public int MaxFileSizeMb => _options.MaxFileSizeMb;
 
@@ -111,6 +111,7 @@ public sealed class IndexModel(
                 validated.Bytes,
                 validated.MediaType,
                 validated.FileName,
+                Application,
                 timeout.Token);
             stopwatch.Stop();
             return new AnalysisItem(

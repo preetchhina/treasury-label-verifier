@@ -17,10 +17,10 @@
     </div>
 </section>
 
-@if (Model.IsDemoProvider)
+@if (Model.UsesLocalOcr)
 {
     <aside class="demo-banner" role="status">
-        <div><strong>Local demo mode</strong><br />The built-in sample is fully functional. Configure a server-side API key to analyze other images.</div>
+        <div><strong>Private local OCR</strong><br />Images are analyzed in this server process with no external AI API or API key. Use a sample or upload your own label.</div>
         <form method="post" class="demo-actions">
             <button type="submit" asp-page-handler="Sample" class="button button-secondary">Run clear sample</button>
             <button type="submit" asp-page-handler="IssueSample" class="button button-secondary">Run issue sample</button>

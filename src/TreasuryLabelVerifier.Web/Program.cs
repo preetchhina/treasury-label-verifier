@@ -4,6 +4,11 @@ using TreasuryLabelVerifier.Web.Configuration;
 using TreasuryLabelVerifier.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+var renderPort = Environment.GetEnvironmentVariable("PORT");
+if (int.TryParse(renderPort, out var port))
+{
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
 
 builder.Services
     .AddOptions<LabelAnalysisOptions>()
@@ -15,18 +20,14 @@ builder.Services.AddRazorPages();
 builder.Services.AddSingleton<ComparisonEngine>();
 builder.Services.AddSingleton<ImageFileValidator>();
 builder.Services.AddSingleton<DemoLabelExtractor>();
-builder.Services.AddHttpClient<OpenAiLabelExtractor>((services, client) =>
-{
-    var options = services.GetRequiredService<IOptions<LabelAnalysisOptions>>().Value;
-    client.BaseAddress = new Uri("https://api.openai.com/");
-    client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
-});
+builder.Services.AddSingleton<OcrTextInterpreter>();
+builder.Services.AddSingleton<TesseractLabelExtractor>();
 builder.Services.AddScoped<ILabelExtractor>(services =>
 {
     var provider = services.GetRequiredService<IOptions<LabelAnalysisOptions>>().Value.Provider;
-    return provider.Equals("OpenAI", StringComparison.OrdinalIgnoreCase)
-        ? services.GetRequiredService<OpenAiLabelExtractor>()
-        : services.GetRequiredService<DemoLabelExtractor>();
+    return provider.Equals("Demo", StringComparison.OrdinalIgnoreCase)
+        ? services.GetRequiredService<DemoLabelExtractor>()
+        : services.GetRequiredService<TesseractLabelExtractor>();
 });
 
 var app = builder.Build();
