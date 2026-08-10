@@ -1,0 +1,15 @@
+@page
+@model PrivacyModel
+@{
+    ViewData["Title"] = "Privacy and limitations";
+}
+<article class="content-page">
+    <p class="eyebrow">Prototype safeguards</p>
+    <h1>Privacy and limitations</h1>
+    <p>Uploaded images are validated and processed in request memory. This application does not write them to local storage or a database. When the OpenAI provider is enabled, image bytes are sent server-to-server for analysis with response storage disabled.</p>
+    <h2>Human review is required</h2>
+    <p>Image extraction can be wrong, especially with glare, curved containers, tiny type, stylized lettering, or incomplete label panels. Physical type size cannot be established from pixels without a reliable scale reference. Results are pre-screening assistance—not legal advice, approval, rejection, or a substitute for current TTB regulations and trained judgment.</p>
+    <h2>Prototype scope</h2>
+    <p>The comparison covers common application fields and the federal health warning. It does not exhaust every product-specific rule, formula requirement, prohibited claim, or COLA workflow.</p>
+    <p><a asp-page="/Index">Return to label verification</a></p>
+</article>

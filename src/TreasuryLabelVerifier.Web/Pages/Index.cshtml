@@ -1,0 +1,211 @@
+@page
+@model IndexModel
+@using TreasuryLabelVerifier.Web.Domain
+@{
+    ViewData["Title"] = "Label verification";
+}
+
+<section class="hero" aria-labelledby="page-title">
+    <div>
+        <p class="eyebrow">AI-assisted pre-screening</p>
+        <h1 id="page-title">Check label artwork against an application</h1>
+        <p class="hero-copy">Upload a clear alcohol label, enter the application values, and get an evidence-backed comparison for human review.</p>
+    </div>
+    <div class="human-review-callout">
+        <span class="callout-icon" aria-hidden="true">✓</span>
+        <div><strong>You make the decision</strong><br />Results are review support, not a legal determination.</div>
+    </div>
+</section>
+
+@if (Model.IsDemoProvider)
+{
+    <aside class="demo-banner" role="status">
+        <div><strong>Local demo mode</strong><br />The built-in sample is fully functional. Configure a server-side API key to analyze other images.</div>
+        <form method="post" class="demo-actions">
+            <button type="submit" asp-page-handler="Sample" class="button button-secondary">Run clear sample</button>
+            <button type="submit" asp-page-handler="IssueSample" class="button button-secondary">Run issue sample</button>
+        </form>
+    </aside>
+}
+
+<form method="post" enctype="multipart/form-data" asp-page-handler="Analyze" id="analysis-form" novalidate>
+    <div asp-validation-summary="ModelOnly" class="validation-summary" role="alert"></div>
+
+    <div class="workspace-grid">
+        <section class="panel upload-panel" aria-labelledby="upload-heading">
+            <div class="step-heading">
+                <span class="step-number">1</span>
+                <div><h2 id="upload-heading">Add label artwork</h2><p>Front, back, or a flattened label image</p></div>
+            </div>
+
+            <label class="drop-zone" for="Uploads">
+                <span class="upload-mark" aria-hidden="true">↑</span>
+                <strong>Choose label images</strong>
+                <span>or drag and drop them here</span>
+                <small>PNG, JPEG, or WebP · up to @Model.MaxFileSizeMb MB each · @Model.MaxBatchSize at once</small>
+                <input asp-for="Uploads" type="file" accept="image/png,image/jpeg,image/webp" multiple />
+            </label>
+            <p id="file-summary" class="file-summary" aria-live="polite">No images selected</p>
+            <span asp-validation-for="Uploads" class="field-validation"></span>
+
+            <div class="tip-box">
+                <strong>For the clearest result</strong>
+                <p>Use a straight-on image with readable small print and minimal glare. Multiple files are compared independently against the same application values.</p>
+            </div>
+        </section>
+
+        <section class="panel data-panel" aria-labelledby="data-heading">
+            <div class="step-heading">
+                <span class="step-number">2</span>
+                <div><h2 id="data-heading">Enter application data</h2><p>Fields marked * are required</p></div>
+            </div>
+
+            <div class="form-grid">
+                <div class="field full">
+                    <label asp-for="Application.BeverageCategory">Beverage category *</label>
+                    <select asp-for="Application.BeverageCategory">
+                        <option value="DistilledSpirits">Distilled spirits</option>
+                        <option value="Wine">Wine</option>
+                        <option value="MaltBeverage">Malt beverage</option>
+                    </select>
+                    <span asp-validation-for="Application.BeverageCategory" class="field-validation"></span>
+                </div>
+                <div class="field full">
+                    <label asp-for="Application.BrandName">Brand name *</label>
+                    <input asp-for="Application.BrandName" autocomplete="off" placeholder="e.g., Old Tom Distillery" />
+                    <span asp-validation-for="Application.BrandName" class="field-validation"></span>
+                </div>
+                <div class="field full">
+                    <label asp-for="Application.ClassType">Class / type *</label>
+                    <input asp-for="Application.ClassType" autocomplete="off" placeholder="e.g., Kentucky Straight Bourbon Whiskey" />
+                    <span asp-validation-for="Application.ClassType" class="field-validation"></span>
+                </div>
+                <div class="field">
+                    <label asp-for="Application.AlcoholContent">Alcohol content *</label>
+                    <input asp-for="Application.AlcoholContent" autocomplete="off" placeholder="e.g., 45% Alc./Vol." />
+                    <span asp-validation-for="Application.AlcoholContent" class="field-validation"></span>
+                </div>
+                <div class="field">
+                    <label asp-for="Application.NetContents">Net contents *</label>
+                    <input asp-for="Application.NetContents" autocomplete="off" placeholder="e.g., 750 mL" />
+                    <span asp-validation-for="Application.NetContents" class="field-validation"></span>
+                </div>
+                <div class="field full">
+                    <label asp-for="Application.ProducerNameAddress">Producer / bottler name and address <span>Optional</span></label>
+                    <input asp-for="Application.ProducerNameAddress" autocomplete="off" placeholder="e.g., Bottled by Example Distillery, Frankfort, KY" />
+                    <span asp-validation-for="Application.ProducerNameAddress" class="field-validation"></span>
+                </div>
+                <div class="field full">
+                    <label asp-for="Application.CountryOfOrigin">Country of origin <span>Imports only</span></label>
+                    <input asp-for="Application.CountryOfOrigin" autocomplete="off" placeholder="e.g., France" />
+                    <span asp-validation-for="Application.CountryOfOrigin" class="field-validation"></span>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="submit-row">
+        <p><strong>Images are processed in memory</strong><br />This prototype does not save uploads.</p>
+        <button type="submit" class="button button-primary" id="analyze-button">
+            <span class="button-label">Analyze label</span>
+            <span class="button-loading" hidden>Analyzing…</span>
+        </button>
+    </div>
+</form>
+
+@if (Model.Items.Count > 0)
+{
+    <section class="results-section" aria-labelledby="results-heading">
+        <div class="results-heading-row">
+            <div><p class="eyebrow">Review queue</p><h2 id="results-heading">Analysis results</h2></div>
+            <p>@Model.Items.Count @(Model.Items.Count == 1 ? "image" : "images") processed</p>
+        </div>
+
+        @foreach (var item in Model.Items)
+        {
+            if (item.Error is not null)
+            {
+                <article class="result-card error-card">
+                    <div class="result-summary"><span class="result-icon" aria-hidden="true">!</span><div><h3>@item.FileName</h3><p>@item.Error</p></div></div>
+                </article>
+                continue;
+            }
+
+            var result = item.Result!;
+            <article class="result-card severity-@Css(result.OverallSeverity)">
+                <header class="result-header">
+                    <div class="result-summary">
+                        <span class="result-icon" aria-hidden="true">@SeverityIcon(result.OverallSeverity)</span>
+                        <div><p class="file-name">@result.FileName</p><h3>@result.OverallTitle</h3><p>Review each reason and confirm against the original artwork.</p></div>
+                    </div>
+                    <div class="result-meta"><span>@result.ElapsedMilliseconds ms</span><span>@result.ProviderName</span></div>
+                </header>
+
+                @if (!string.IsNullOrWhiteSpace(result.ImageQualityNote))
+                {
+                    <p class="quality-note"><strong>Image quality:</strong> @result.ImageQualityNote</p>
+                }
+
+                <div class="table-wrap">
+                    <table>
+                        <caption class="sr-only">Application and label field comparisons for @result.FileName</caption>
+                        <thead><tr><th scope="col">Field</th><th scope="col">Application</th><th scope="col">Observed on label</th><th scope="col">Result and reason</th></tr></thead>
+                        <tbody>
+                        @foreach (var field in result.Fields)
+                        {
+                            <tr>
+                                <th scope="row">@field.Field</th>
+                                <td><span class="cell-value">@(field.Expected ?? "Not supplied")</span></td>
+                                <td>
+                                    <span class="cell-value">@(field.Observed ?? "Not readable")</span>
+                                    @if (!string.IsNullOrWhiteSpace(field.Evidence)) { <small class="evidence">Evidence: @field.Evidence</small> }
+                                </td>
+                                <td>
+                                    <span class="status status-@Css(field.Status)">@StatusLabel(field.Status)</span>
+                                    <p>@field.Reason</p>
+                                    @if (field.Status is not ComparisonStatus.NotProvided) { <small>Confidence @field.Confidence.ToString("P0")</small> }
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+
+                <details class="visual-details" open>
+                    <summary>Government warning visual checks</summary>
+                    <div class="visual-grid">
+                    @foreach (var check in result.WarningVisualChecks)
+                    {
+                        <div class="visual-check severity-@Css(check.Severity)">
+                            <span aria-hidden="true">@SeverityIcon(check.Severity)</span>
+                            <div><strong>@check.Requirement</strong><p>@check.Reason</p></div>
+                        </div>
+                    }
+                    </div>
+                </details>
+            </article>
+        }
+    </section>
+}
+
+<div class="loading-overlay" id="loading-overlay" hidden role="status" aria-live="assertive">
+    <div class="loading-card"><span class="spinner" aria-hidden="true"></span><strong>Reading the label…</strong><p>Most images finish in a few seconds.</p></div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+@functions {
+    private static string Css(Enum value) => value.ToString().ToLowerInvariant();
+    private static string SeverityIcon(ReviewSeverity severity) => severity switch { ReviewSeverity.Pass => "✓", ReviewSeverity.Review => "?", _ => "!" };
+    private static string StatusLabel(ComparisonStatus status) => status switch
+    {
+        ComparisonStatus.ExactMatch => "Exact match",
+        ComparisonStatus.FormattingDifference => "Formatting only",
+        ComparisonStatus.Mismatch => "Mismatch",
+        ComparisonStatus.Unreadable => "Unreadable",
+        ComparisonStatus.LowConfidence => "Low confidence",
+        _ => "Not compared"
+    };
+}

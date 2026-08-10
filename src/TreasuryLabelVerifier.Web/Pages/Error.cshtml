@@ -1,0 +1,15 @@
+@page
+@model ErrorModel
+@{
+    ViewData["Title"] = "Something went wrong";
+}
+<article class="content-page" role="alert">
+    <p class="eyebrow">Request not completed</p>
+    <h1>Something went wrong</h1>
+    <p>The label could not be processed because of an unexpected server error. No upload was saved. Return to the review form and try again.</p>
+    @if (Model.ShowRequestId)
+    {
+        <p><strong>Support reference:</strong> <code>@Model.RequestId</code></p>
+    }
+    <p><a asp-page="/Index">Return to label verification</a></p>
+</article>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="AI-assisted alcohol label verification prototype for human compliance review." />
+    <title>@ViewData["Title"] · Label Review Assistant</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" asp-page="/Index" aria-label="Label Review Assistant home">
+                <span class="brand-mark" aria-hidden="true">T</span>
+                <span><strong>Label Review Assistant</strong><small>Treasury take-home prototype</small></span>
+            </a>
+            <span class="prototype-pill">Prototype</span>
+        </div>
+    </header>
+    <main id="main-content" class="page-shell">
+        @RenderBody()
+    </main>
+    <footer>
+        <div class="footer-inner"><p><strong>Label Review Assistant</strong><br />Decision support for trained human reviewers.</p><p><a asp-page="/Privacy">Privacy &amp; limitations</a></p></div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

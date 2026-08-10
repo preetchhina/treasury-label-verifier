@@ -1,0 +1,26 @@
+# .NET build output
+**/bin/
+**/obj/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+secrets.json
+
+# Editors and operating system
+.DS_Store
+.idea/
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Test and coverage output
+TestResults/
+coverage/
+
+# Codex/local working material
+work/
+outputs/
