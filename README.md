@@ -2,6 +2,8 @@
 
 An AI-assisted alcohol-label pre-screening prototype for Treasury's TTB take-home assignment. A reviewer uploads label artwork, enters application values, and receives field-by-field comparisons with extracted evidence, confidence, and reasons. Results deliberately end at **human review**; they are not legal approvals or rejections.
 
+**Live prototype:** [treasury-label-verifier-tot3.onrender.com](https://treasury-label-verifier-tot3.onrender.com)
+
 For a quick demo, run the application and select **Run clear sample** followed by **Run issue sample**. The first shows exact and formatting-only matches; the second demonstrates warning capitalization and punctuation failures with extracted evidence.
 
 ## What the prototype does
@@ -128,8 +130,8 @@ Manual browser verification covers both sample POST workflows, evidence renderin
 
 Measured locally on August 10, 2026, after a warm Release build:
 
-- clear 1200 × 1500 PNG, local OCR + interpretation + comparison: **594 ms** server-reported;
-- automated comparison/test suite: **14 tests in 28–41 ms** after build.
+- clear 800 × 1000 PNG, local OCR + interpretation + comparison: **423 ms** server-reported;
+- automated comparison/test suite: **14 tests in 45 ms** after build.
 
 This comfortably meets the approximately five-second target for the representative fixture on the development machine. It is not a production percentile or accuracy benchmark. Cold starts, host CPU throttling, larger images, and multiple files will change performance; the UI enforces a 15-second per-image timeout and reports failures independently.
 
