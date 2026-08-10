@@ -133,7 +133,12 @@ Measured locally on August 10, 2026, after a warm Release build:
 - clear 800 × 1000 PNG, local OCR + interpretation + comparison: **423 ms** server-reported;
 - automated comparison/test suite: **14 tests passed** after build.
 
-This comfortably meets the approximately five-second target for the representative fixture on the development machine. It is not a production percentile or accuracy benchmark. Cold starts, host CPU throttling, larger images, and multiple files will change performance; the UI enforces a 15-second per-image timeout and reports failures independently.
+Measured on the warm deployed Render Free service on August 10, 2026:
+
+- clear sample: **3,205 ms** server-reported;
+- intentional warning-error sample: **2,848 ms** server-reported.
+
+These representative warm runs meet the approximately five-second target. They are not production percentiles or an accuracy benchmark. The Render Free instance can take 50 seconds or more to wake after inactivity; host CPU throttling, larger images, and multiple files will also change performance. The UI enforces a 15-second per-image analysis timeout and reports failures independently.
 
 ## Supported fields and comparison behavior
 
