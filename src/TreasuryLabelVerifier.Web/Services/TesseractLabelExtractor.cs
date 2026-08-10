@@ -46,6 +46,10 @@ public sealed class TesseractLabelExtractor(
         startInfo.ArgumentList.Add("11");
         startInfo.ArgumentList.Add("tsv");
 
+        // Tesseract's OpenMP default can oversubscribe tiny shared-CPU containers.
+        // One OCR thread is faster and more predictable on the supported free-hosting profile.
+        startInfo.Environment["OMP_THREAD_LIMIT"] = "1";
+
         using var process = new Process { StartInfo = startInfo };
         try
         {

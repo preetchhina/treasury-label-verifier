@@ -131,7 +131,7 @@ Manual browser verification covers both sample POST workflows, evidence renderin
 Measured locally on August 10, 2026, after a warm Release build:
 
 - clear 800 × 1000 PNG, local OCR + interpretation + comparison: **423 ms** server-reported;
-- automated comparison/test suite: **14 tests in 45 ms** after build.
+- automated comparison/test suite: **14 tests passed** after build.
 
 This comfortably meets the approximately five-second target for the representative fixture on the development machine. It is not a production percentile or accuracy benchmark. Cold starts, host CPU throttling, larger images, and multiple files will change performance; the UI enforces a 15-second per-image timeout and reports failures independently.
 
